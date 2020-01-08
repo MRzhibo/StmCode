@@ -26,7 +26,7 @@ sbit K6 = P1^5;
 #define KEY4   4
 #define KEY5   5
 #define KEY6   6
-uint  statu =0;
+uint  statu = 1;
 uint count_num = 0;
 uint qian,bai,shi,ge;
 uint data1,data2,data3,data4;
@@ -59,21 +59,21 @@ void Statu_set()
 {
 	switch(statu)
 		{
-			case 0:LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
+			case 1:LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
 						 break;
-			case 1:LED_CHOODE1 = 0;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
+			case 2:LED_CHOODE1 = 0;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
 						 break;
-			case 2:LED_CHOODE1 = 1;LED_CHOODE2 = 0;LED_CHOODE3 = 0;
+			case 3:LED_CHOODE1 = 1;LED_CHOODE2 = 0;LED_CHOODE3 = 0;
 						 break;
-			case 3:LED_CHOODE1 = 0;LED_CHOODE2 = 0;LED_CHOODE3 = 0;
+			case 4:LED_CHOODE1 = 0;LED_CHOODE2 = 0;LED_CHOODE3 = 0;
 						 break;
-			case 4:LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 1;
+			case 5:LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 1;
 						 break;
-			case 5:LED_CHOODE1 = 0;LED_CHOODE2 = 1;LED_CHOODE3 = 1;
+			case 6:LED_CHOODE1 = 0;LED_CHOODE2 = 1;LED_CHOODE3 = 1;
 						 break;
-			case 6:LED_CHOODE1 = 1;LED_CHOODE2 = 0;LED_CHOODE3 = 1;
+			case 7:LED_CHOODE1 = 1;LED_CHOODE2 = 0;LED_CHOODE3 = 1;
 						 break;
-			case 7:LED_CHOODE1 = 0;LED_CHOODE2 = 0;LED_CHOODE3 = 1;
+			case 8:LED_CHOODE1 = 0;LED_CHOODE2 = 0;LED_CHOODE3 = 1;
 						 break;
 		}
 }
@@ -171,16 +171,16 @@ void Close_display()
 /*按键功能函数*/
 void datapros()
 {
-	uint dat = 0;
 	uint key=KeyScan(0);
 	switch(key)
 	{
 		case 1: 
 				if(key_flag == 1)
 				{
+					
 					switch(statu)
 					{
-						case 0 :
+						case 1 :
 							open_num1++;
 							Numeric = Numeric_number[open_num1];
 							if(open_num1>=10)
@@ -188,7 +188,7 @@ void datapros()
 								open_num1=0; 
 							}
 							break;
-						case 1 :
+						case 2 :
 							open_num2++;
 							Numeric = Numeric_number[open_num2];
 							if(open_num2>=10)
@@ -196,7 +196,7 @@ void datapros()
 								open_num2=0; 
 							}
 							break;
-						case 2 :
+						case 3 :
 							close_num1++;
 							Numeric = Numeric_number[close_num1];
 							if(close_num1>=10)
@@ -204,7 +204,7 @@ void datapros()
 								close_num1=0; 
 							}
 							break;
-						case 3 :
+						case 4 :
 							close_num2++;
 							Numeric = Numeric_number[close_num2];
 							if(close_num2>=10)
@@ -212,15 +212,17 @@ void datapros()
 								close_num2=0; 
 							}
 							break;
+
 					}			
 				}
 			break;//add
 		case 2:  
 			if(key_flag == 1)
 			{
+				Statu_set();
 				switch(statu)
 					{
-						case 0 :
+						case 1 :
 							Numeric = Numeric_number[open_num1];
 							open_num1--;
 							if(open_num1<=0)
@@ -228,7 +230,7 @@ void datapros()
 								open_num1=9; 
 							}
 							break;
-						case 1 :
+						case 2 :
 							Numeric = Numeric_number[open_num2];
 							open_num2--;
 							if(open_num1<=0)
@@ -236,7 +238,7 @@ void datapros()
 								open_num1=9; 
 							}
 							break;
-						case 2 :
+						case 3 :
 							Numeric = Numeric_number[close_num1];
 							close_num1--;
 							if(close_num1<=0)
@@ -244,7 +246,7 @@ void datapros()
 								close_num1=9; 
 							}
 							break;
-						case 3 :
+						case 4 :
 							Numeric = Numeric_number[close_num2];
 							close_num2--;
 							if(close_num2<=0)
@@ -257,39 +259,37 @@ void datapros()
 			break;//cat
 		case 3:  
 			if(key_flag == 1)
-				{
-					Statu_set(); //位选
-					Numeric = Numeric_number[open_num1];
-					statu++;		 
-					switch(statu)
-					{
-						case 0:Numeric = Numeric_number[open_num1];break;
-						case 1:Numeric = Numeric_number[open_num2];break;
-						case 2:Numeric = Numeric_number[close_num1];break;
-						case 3:Numeric = Numeric_number[close_num2];break;
-					}
+				{	
 					if(statu >= 4)
 					{ 
 						statu = 0;  
 					}		
+					statu++;
+					Statu_set(); //位选
+					switch(statu)
+					{
+						case 1:Numeric = Numeric_number[open_num1];break;
+						case 2:Numeric = Numeric_number[open_num2];break;
+						case 3:Numeric = Numeric_number[close_num1];break;
+						case 4:Numeric = Numeric_number[close_num2];break;
+					}
 		    }			
 			break;  // move right
 		case 4:  
 			if(key_flag == 1)
 				{
-					Statu_set(); //位选
-					if(statu <= 0) 
+					if(statu <= 1) 
 					{
-						statu = 4;
+						statu = 5;
 					}
-					Numeric = Numeric_number[close_num2];
 					statu--;  
+					Statu_set(); //位选
 					switch(statu)
 					{
-						case 0:Numeric = Numeric_number[open_num1];break;
-						case 1:Numeric = Numeric_number[open_num2];break;
-						case 2:Numeric = Numeric_number[close_num1];break;
-						case 3:Numeric = Numeric_number[close_num2];break;
+						case 1:Numeric = Numeric_number[open_num1];break;
+						case 2:Numeric = Numeric_number[open_num2];break;
+						case 3:Numeric = Numeric_number[close_num1];break;
+						case 4:Numeric = Numeric_number[close_num2];break;
 					}
 				}					
 			break;  // move left
@@ -301,7 +301,9 @@ void datapros()
       open_num2 = 0;
       close_num1 = 0;
       close_num2 = 0;
-			statu=0;
+			statu = 1;
+			LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
+			Numeric = Numeric_number[0];
 			break;//按键设置开始
 		case 6:
 			key_flag = 0;
