@@ -182,37 +182,36 @@ void datapros()
 					{
 						case 1 :
 							open_num1++;
-							Numeric = Numeric_number[open_num1];
 							if(open_num1>=10)
 							{
 								open_num1=0; 
 							}
+							Numeric = Numeric_number[open_num1];
 							break;
 						case 2 :
 							open_num2++;
-							Numeric = Numeric_number[open_num2];
 							if(open_num2>=10)
 							{
 								open_num2=0; 
 							}
+							Numeric = Numeric_number[open_num2];
 							break;
 						case 3 :
 							close_num1++;
-							Numeric = Numeric_number[close_num1];
 							if(close_num1>=10)
-							{
-								close_num1=0; 
-							}
+								{
+									close_num1=0; 
+								}
+							Numeric = Numeric_number[close_num1];
 							break;
 						case 4 :
 							close_num2++;
-							Numeric = Numeric_number[close_num2];
 							if(close_num2>=10)
-							{
-								close_num2=0; 
-							}
+								{
+									close_num2=0; 
+								}
+							Numeric = Numeric_number[close_num2];
 							break;
-
 					}			
 				}
 			break;//add
@@ -223,36 +222,36 @@ void datapros()
 				switch(statu)
 					{
 						case 1 :
-							Numeric = Numeric_number[open_num1];
-							open_num1--;
 							if(open_num1<=0)
 							{
-								open_num1=9; 
+								open_num1=10; 
 							}
+							open_num1--;
+							Numeric = Numeric_number[open_num1];
 							break;
 						case 2 :
-							Numeric = Numeric_number[open_num2];
-							open_num2--;
-							if(open_num1<=0)
+							if(open_num2<=0)
 							{
-								open_num1=9; 
+								open_num2=10; 
 							}
+							open_num2--;
+							Numeric = Numeric_number[open_num2];
 							break;
 						case 3 :
-							Numeric = Numeric_number[close_num1];
-							close_num1--;
 							if(close_num1<=0)
 							{
-								close_num1=9; 
+								close_num1=10; 
 							}
+							close_num1--;
+							Numeric = Numeric_number[close_num1];
 							break;
 						case 4 :
-							Numeric = Numeric_number[close_num2];
-							close_num2--;
 							if(close_num2<=0)
 							{
-								close_num2=9; 
+								close_num2=10; 
 							}
+							close_num2--;
+							Numeric = Numeric_number[close_num2];
 							break;
 					}			
 			}
@@ -330,6 +329,7 @@ void Timer() interrupt 1
 				{
 					open_flag = 0;
 					close_flag = 1;
+					close = ~close;
 				}
 		}
 		if(close_flag == 1)
@@ -338,6 +338,7 @@ void Timer() interrupt 1
 			if(close_cont<=0)
 			{
 				open_flag = 1;
+				close = ~close;
 				close_flag = 0;
 				count_num++;
 				open_cont = open_num1*10 + open_num2;
@@ -365,14 +366,10 @@ void main(void)
 	ET0=1;				//请求中断
 	TR0=1;				//允许中断
 	
-	close = 0;
+	close = 1;
 	BEEP = 0;
 	LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
 	Numeric = Numeric_number[0];
-//	LED1 = 1;
-//	LED2 = 1;
-//  LED3 = 1;
-//	LED4 = 1;
 	
 	while(1)
 	{
