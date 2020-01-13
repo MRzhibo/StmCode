@@ -27,6 +27,7 @@ sbit K6 = P1^5;
 #define KEY5   5
 #define KEY6   6
 uint  statu = 1;
+uint g_display = 1;
 uint count_num = 0;
 uint qian,bai,shi,ge;
 uint data1,data2,data3,data4;
@@ -43,9 +44,13 @@ uint key_flag = 0;
 uint show_flag = 0;
 uint open_flag = 1;
 uint close_flag = 0;
-uchar code Numeric_number[15] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f};  //0~9
+uint display_flag = 1;
+uchar code Numeric_number[15] = {0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00};  //0~9
 void Dynamic_show();
 uchar i;
+bit SystemTime2Ms = 0;
+uint TimeCount0;
+uint S_Flag = 0;
 
 void delayms(uint xms)
 {
@@ -78,6 +83,28 @@ void Statu_set()
 		}
 }
 
+void display_set()
+{
+	switch(g_display)
+		{
+			case 1:LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
+						 break;
+			case 2:LED_CHOODE1 = 0;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
+						 break;
+			case 3:LED_CHOODE1 = 1;LED_CHOODE2 = 0;LED_CHOODE3 = 0;
+						 break;
+			case 4:LED_CHOODE1 = 0;LED_CHOODE2 = 0;LED_CHOODE3 = 0;
+						 break;
+			case 5:LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 1;
+						 break;
+			case 6:LED_CHOODE1 = 0;LED_CHOODE2 = 1;LED_CHOODE3 = 1;
+						 break;
+			case 7:LED_CHOODE1 = 1;LED_CHOODE2 = 0;LED_CHOODE3 = 1;
+						 break;
+			case 8:LED_CHOODE1 = 0;LED_CHOODE2 = 0;LED_CHOODE3 = 1;
+						 break;
+		}
+}
 /*mode = 0 单次按键   1 ： 连续按键*/
 uint KeyScan(uchar mode)
 {
@@ -131,7 +158,84 @@ void Synchr_display()
 	delayms(1);
 }
 
-
+//闪烁
+void display()
+{
+	uint i;
+	{
+		if(S_Flag)
+		{
+			for(i=1;i<5;i++)
+			{
+				g_display = i;
+				display_set(); //位选
+				
+				switch(g_display)
+				{
+					case 1:
+						if(i == statu )
+						{
+							Numeric = Numeric_number[10];
+						}
+						else
+						{
+							Numeric = Numeric_number[open_num1];
+						}
+						break;
+					case 2:
+						if(i == statu )
+						{
+							Numeric = Numeric_number[10];
+						}
+						else
+						{
+							Numeric = Numeric_number[open_num2];
+						}
+						break;
+					case 3:
+						if(i == statu )
+						{
+							Numeric = Numeric_number[10];
+						}
+						else
+						{
+							Numeric = Numeric_number[close_num1];
+						}
+						break;
+					case 4:
+						if(i == statu )
+						{
+							Numeric = Numeric_number[10];
+						}
+						else
+						{
+							Numeric = Numeric_number[close_num2];
+						}
+						break;
+				}			
+				delayms(3);
+			}
+		}
+		else
+		{
+				
+			for(i=1;i<5;i++)
+			{
+				g_display = i;
+				display_set(); //位选
+				
+				switch(g_display)
+				{
+					case 1:Numeric = Numeric_number[open_num1];break;
+					case 2:Numeric = Numeric_number[open_num2];break;
+					case 3:Numeric = Numeric_number[close_num1];break;
+					case 4:Numeric = Numeric_number[close_num2];break;
+				}			
+				delayms(3);
+			}
+		}
+	}
+}
 
 /*继电开关显示*/
 void Open_display()
@@ -175,9 +279,8 @@ void datapros()
 	switch(key)
 	{
 		case 1: 
-				if(key_flag == 1)
-				{
-					
+			if(key_flag == 1)
+			{
 					switch(statu)
 					{
 						case 1 :
@@ -185,8 +288,7 @@ void datapros()
 							if(open_num1>=10)
 							{
 								open_num1=0; 
-							}
-							Numeric = Numeric_number[open_num1];
+							}						
 							break;
 						case 2 :
 							open_num2++;
@@ -194,7 +296,6 @@ void datapros()
 							{
 								open_num2=0; 
 							}
-							Numeric = Numeric_number[open_num2];
 							break;
 						case 3 :
 							close_num1++;
@@ -202,7 +303,6 @@ void datapros()
 								{
 									close_num1=0; 
 								}
-							Numeric = Numeric_number[close_num1];
 							break;
 						case 4 :
 							close_num2++;
@@ -210,12 +310,11 @@ void datapros()
 								{
 									close_num2=0; 
 								}
-							Numeric = Numeric_number[close_num2];
 							break;
-					}			
-				}
+					}	
+				}					
 			break;//add
-		case 2:  
+		case 2: 
 			if(key_flag == 1)
 			{
 				Statu_set();
@@ -227,7 +326,6 @@ void datapros()
 								open_num1=10; 
 							}
 							open_num1--;
-							Numeric = Numeric_number[open_num1];
 							break;
 						case 2 :
 							if(open_num2<=0)
@@ -235,7 +333,6 @@ void datapros()
 								open_num2=10; 
 							}
 							open_num2--;
-							Numeric = Numeric_number[open_num2];
 							break;
 						case 3 :
 							if(close_num1<=0)
@@ -243,7 +340,6 @@ void datapros()
 								close_num1=10; 
 							}
 							close_num1--;
-							Numeric = Numeric_number[close_num1];
 							break;
 						case 4 :
 							if(close_num2<=0)
@@ -251,51 +347,35 @@ void datapros()
 								close_num2=10; 
 							}
 							close_num2--;
-							Numeric = Numeric_number[close_num2];
 							break;
-					}			
-			}
+					}	
+				}
 			break;//cat
 		case 3:  
 			if(key_flag == 1)
-				{	
-					if(statu >= 4)
+			{
+				if(statu >= 4)
 					{ 
 						statu = 0;  
 					}		
 					statu++;
-					Statu_set(); //位选
-					switch(statu)
-					{
-						case 1:Numeric = Numeric_number[open_num1];break;
-						case 2:Numeric = Numeric_number[open_num2];break;
-						case 3:Numeric = Numeric_number[close_num1];break;
-						case 4:Numeric = Numeric_number[close_num2];break;
-					}
-		    }			
+			}		
 			break;  // move right
-		case 4:  
-			if(key_flag == 1)
-				{
-					if(statu <= 1) 
+		case 4:
+					if(key_flag == 1)
 					{
-						statu = 5;
-					}
-					statu--;  
-					Statu_set(); //位选
-					switch(statu)
-					{
-						case 1:Numeric = Numeric_number[open_num1];break;
-						case 2:Numeric = Numeric_number[open_num2];break;
-						case 3:Numeric = Numeric_number[close_num1];break;
-						case 4:Numeric = Numeric_number[close_num2];break;
-					}
-				}					
+						if(statu <= 1) 
+						{
+							statu = 5;
+						}
+						statu--;
+					}	
 			break;  // move left
 		case 5:  
 			key_flag = 1;
 		  count_num = 0;
 	   	show_flag = 0;
+		  display_flag = 1;
 			open_num1 = 0;
       open_num2 = 0;
       close_num1 = 0;
@@ -307,21 +387,32 @@ void datapros()
 		case 6:
 			key_flag = 0;
 		  show_flag = 1;
+		  display_flag = 0;
 			open_cont = open_num1*10 + open_num2;
 			close_cont = close_num1*10 + close_num2;
 			break;//设置完成 break;
 	}
 }
 
-
-/*中断计数函数*/
-void Timer() interrupt 1
+/*定时器初始化*/
+void TimerInit()
 {
-	if(count >= 20)
+	TMOD=0X11;
+	TH0=(65536-50000)/256;
+	TL0=(65536-50000)%256;
+	EA = 1;
+	ET0=1;
+	TR0=1;
+}
+
+
+/*定时器0中断计数函数*/
+void Timer0() interrupt 1
+{
+	if(count >= 10)
 	{				//20*50MS定时时间为1.0秒
 		count=0;
-//		BEEP = ~BEEP;
-//		close = ~close;
+		S_Flag=!S_Flag;	
 		if(open_flag == 1)
 		{
 				open_cont--;
@@ -355,21 +446,13 @@ void Timer() interrupt 1
 /*
 	main function
 */
-
 void main(void)
 {
-	TMOD &= 0X0F;		/*中断初始化*/
-	TMOD |= 0X01;
-	TH0=(65536-50000)/256;	
-	TL0=(65536-50000)%256;
-	EA=1;				//中断总开关
-	ET0=1;				//请求中断
-	TR0=1;				//允许中断
-	
-	close = 1;
-	BEEP = 0;
+	TimerInit();
 	LED_CHOODE1 = 1;LED_CHOODE2 = 1;LED_CHOODE3 = 0;
 	Numeric = Numeric_number[0];
+	
+	BEEP = 0;
 	
 	while(1)
 	{
@@ -386,10 +469,13 @@ void main(void)
 			Synchr_display();
 		}
 		datapros();
+		if(display_flag)
+		{
+			display();
+		}
 	}
 }
 
-	
 
 
 
